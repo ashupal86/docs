@@ -1,0 +1,56 @@
+---
+title: Connecting to Hostinger
+description: Point your Devinit subdomain to Hostinger hosting.
+---
+
+# Connecting Your Subdomain to Hostinger
+
+Hostinger offers various hosting services, including shared hosting, cloud hosting, and VPS. Pointing your Devinit subdomain to a site hosted with Hostinger typically involves using A records or CNAME records, depending on the specific service and what Hostinger provides.
+
+Refer to the [official Hostinger documentation](https://support.hostinger.com/en/collections/1840009-domains) for the most accurate and detailed setup instructions.
+
+## Typical DNS Records Required by Hostinger
+
+*   **For most hosting plans (Shared, WordPress, Cloud)**: Hostinger will usually provide you with an **IP Address** for your hosting account/server. You will use this IP address to create an **A Record** in your Devinit DNS settings.
+*   **Specific services or configurations**: In some cases, particularly if you're using a service that acts as a proxy or a specific application platform within Hostinger, they might provide a hostname for a **CNAME Record**.
+
+Always check your Hostinger hPanel or consult their support/documentation for the exact value (IP address or hostname) you need to use.
+
+## General Steps
+
+1.  **Locate Your Hosting IP Address or Target Hostname in Hostinger**:
+    *   Log in to your Hostinger hPanel.
+    *   Navigate to your hosting account details. This is often found under a "Hosting" or "Websites" section.
+    *   Look for details like "Server IP Address," "Website IP Address," or specific instructions for pointing your domain.
+    *   For example, under Hosting -> Manage -> Details, you might find the IP address.
+    *   If you intend to use a CNAME, Hostinger would provide the target hostname.
+
+2.  **Consider Adding the Subdomain in Hostinger (if applicable)**:
+    *   Depending on your Hostinger plan and how it manages domains/subdomains, you might need to add your Devinit subdomain as an "Addon Domain" or ensure it's correctly configured within your hosting account to serve content for that specific subdomain. This step is internal to Hostinger's setup.
+    *   This is separate from the DNS configuration you do in Devinit but is crucial for Hostinger to know what website to show when traffic for your subdomain arrives at their server.
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to Hostinger.
+    *   **If using an A Record (most common for Hostinger shared/cloud/VPS)**:
+        *   Set **Record Type** to `A`.
+        *   Set **Target Value** to the IP address provided by Hostinger.
+    *   **If using a CNAME Record**:
+        *   Set **Record Type** to `CNAME`.
+        *   Set **Target Value** to the hostname provided by Hostinger.
+    *   Click "Save Configuration".
+
+4.  **Wait for DNS Propagation**:
+    *   DNS changes can take a few minutes to several hours (up to 48 in rare cases) to propagate globally. Our DNS provider (Dynadot) has a **10-minute TTL**, so initial updates from Devinit are fast. However, full global propagation for your Hostinger site to be accessible everywhere via the new record depends on worldwide DNS cache updates.
+    *   Once propagated, your Devinit subdomain should resolve to your Hostinger server/service.
+
+## Troubleshooting
+
+*   **Website Not Loading / Default Hostinger Page Shows**: 
+    *   **DNS Propagation**: Be patient and allow time for DNS to update globally (see point 4).
+    *   **Correct IP/Hostname**: Double-check the IP address or hostname entered in Devinit matches exactly what Hostinger provided.
+    *   **Hostinger Configuration**: Ensure your subdomain is correctly set up within your Hostinger account to serve your website content (e.g., files in the correct directory, domain added to the hosting plan).
+    *   **Conflicting Records**: Ensure you don't have old or conflicting DNS records (e.g., both an A and a CNAME record for the same subdomain meant for traffic) in your Devinit DNS settings.
+*   **SSL Certificate**: After pointing your domain, ensure an SSL certificate is active for your subdomain within Hostinger (Hostinger usually provides free SSL).
+
+**Always consult the [official Hostinger support documentation](https://support.hostinger.com/) for the most up-to-date information specific to your hosting plan.** 

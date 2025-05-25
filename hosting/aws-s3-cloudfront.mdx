@@ -1,0 +1,61 @@
+---
+title: Connecting to AWS S3 & CloudFront
+description: Point your Devinit subdomain to a static site on S3 served via CloudFront.
+---
+
+# Connecting to AWS S3 & CloudFront
+
+Hosting a static website on Amazon S3 (Simple Storage Service) and serving it through Amazon CloudFront (a Content Delivery Network - CDN) is a popular, scalable, and cost-effective solution. You can point your Devinit subdomain to your CloudFront distribution.
+
+This guide assumes you have already:
+1.  Created an S3 bucket and configured it for static website hosting.
+2.  Created a CloudFront distribution that points to your S3 bucket.
+3.  Configured an SSL/TLS certificate for your custom domain in AWS Certificate Manager (ACM) in the **us-east-1 (N. Virginia)** region (this is a requirement for CloudFront) and associated it with your CloudFront distribution.
+
+Refer to the official AWS documentation for [S3 static hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html), [CloudFront custom domains](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html), and [ACM certificates for CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-and-https-requirements.html#https-requirements-aws-certificate-manager) for detailed setup.
+
+## Typical DNS Records Required
+
+To point your Devinit subdomain to a CloudFront distribution, you will use a **CNAME record**.
+
+*   CloudFront provides a unique domain name for your distribution (e.g., `d12345abcdef8.cloudfront.net`). You will create a CNAME record in your Devinit profile pointing your subdomain to this CloudFront domain name.
+
+**Important Note on CNAMEs and Apex Domains (Not directly applicable here but for context):** While you are using a subdomain from Devinit (e.g., `mysub.devinit.example.com`), if you were ever trying to point an apex domain (e.g., `example.com`) directly to CloudFront, you couldn't use a standard CNAME record. Instead, you'd use Amazon Route 53 (AWS's DNS service) which supports ALIAS records, or use other DNS providers that offer CNAME-like functionality at the apex. For your Devinit subdomain, a CNAME is the correct approach.
+
+## General Steps
+
+1.  **Get Your CloudFront Distribution Domain Name**:
+    *   Log in to your AWS Management Console and navigate to CloudFront.
+    *   Select your distribution.
+    *   In the "General" tab (or details page), find the "Distribution domain name" (e.g., `dxxxxxxxxxxxxx.cloudfront.net`). Copy this value.
+
+2.  **Ensure Your CloudFront Distribution is Configured for Your Custom Subdomain**:
+    *   In your CloudFront distribution settings, under the "General" tab, click "Edit."
+    *   In the "Alternate domain name (CNAME)" field (sometimes labeled "Custom Domain Names (CNAMEs)"), add your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`). You can add multiple.
+    *   Ensure you have selected your SSL certificate (from ACM in us-east-1) for "Custom SSL certificate."
+    *   Save changes. The distribution will take some time to redeploy (propagate changes to edge locations).
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to CloudFront.
+    *   Set **Record Type** to `CNAME`.
+    *   Set **Target Value** to the CloudFront distribution domain name you copied in Step 1 (e.g., `dxxxxxxxxxxxxx.cloudfront.net`).
+    *   Click "Save Configuration".
+
+4.  **Wait for DNS Propagation and CloudFront Deployment**:
+    *   DNS changes from Devinit (via Dynadot with a **10-minute TTL**) will start propagating quickly.
+    *   However, CloudFront also needs to deploy your changes (like adding the alternate domain name) to all its edge locations. This can take 5-20 minutes or sometimes longer.
+    *   Full global DNS propagation for your CNAME record can also take from a few minutes up to 48 hours, but is usually much quicker.
+    *   Wait until your CloudFront distribution status is "Deployed" and DNS has propagated.
+
+## Troubleshooting
+
+*   **Error Accessing Site / SSL Errors / 403 Errors from CloudFront**:
+    *   **DNS Propagation**: Allow sufficient time.
+    *   **CloudFront Alternate Domain Name**: Crucial! Ensure your full Devinit subdomain is listed in your CloudFront distribution's "Alternate domain name (CNAME)" settings.
+    *   **SSL Certificate**: Verify your ACM certificate is valid, covers your subdomain, is in the `us-east-1` region, and is correctly associated with the CloudFront distribution.
+    *   **S3 Bucket Policy/Permissions**: If CloudFront can't access your S3 bucket, you might get errors. Ensure your S3 bucket policy and CloudFront Origin Access Identity (OAI) or Origin Access Control (OAC) are correctly configured if you are restricting direct S3 access.
+    *   **Default Root Object**: In your CloudFront distribution settings (Origins tab > Your S3 Origin > Edit), ensure you have a "Default root object" specified (e.g., `index.html`) if you want `mysubdomain.devinit.example.com/` to serve your main page.
+*   **CNAME Value**: Double-check the CNAME target in Devinit is exactly the `*.cloudfront.net` domain, not your S3 bucket website endpoint.
+
+**Refer to the comprehensive [AWS CloudFront Developer Guide](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html) for detailed information.** 

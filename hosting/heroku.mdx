@@ -1,0 +1,121 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Heroku
+
+Heroku is a popular Platform as a Service (PaaS) for deploying web applications. To use a custom subdomain with your Heroku app, you'll need to configure it in Heroku and then set up the appropriate DNS records.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A deployed application on Heroku (using at least a Hobby dyno for custom domains with SSL).
+*   Access to your domain's DNS settings on our platform.
+*   Heroku CLI installed and authenticated (`heroku login`).
+
+## Step 1: Add Your Custom Domain to Your Heroku App
+
+Heroku needs to associate your custom subdomain with your application.
+
+<Steps>
+
+### Identify Your Heroku App Name
+   If you're unsure, use `heroku apps` to list your applications.
+
+### Add the Custom Domain
+   Use the Heroku CLI to add your custom subdomain:
+   ```bash
+   heroku domains:add your.subdomain.com --app your-heroku-app-name
+   ```
+   Replace `your.subdomain.com` with your desired subdomain (e.g., `www.yourdomain.com` or `app.yourdomain.com`) and `your-heroku-app-name` with your app's name on Heroku.
+
+### Note the DNS Target
+   After adding the domain, Heroku will provide you with a DNS Target. This will be a hostname ending in `.herokudns.com` (e.g., `your-subdomain-com.herokudns.com` or `tokyo-1234.herokudns.com`).
+   You can also view this information by running:
+   ```bash
+   heroku domains --app your-heroku-app-name
+   ```
+   Look for your custom domain in the list and note its corresponding "DNS Target".
+
+</Steps>
+
+This DNS Target is what you'll use for your CNAME record.
+
+## Step 2: Add CNAME Record on Our Platform
+
+Now, configure the CNAME record in your domain registrar's control panel (our platform).
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard and go to the DNS management section for your domain.
+
+### Add the CNAME Record
+
+*   **Type:** `CNAME`
+*   **Name/Host:** Your subdomain (e.g., `www`, `app`). This is the part of `your.subdomain.com` before your main domain.
+*   **Value/Target:** The DNS Target hostname provided by Heroku (e.g., `something.herokudns.com`).
+*   **TTL:** 600 seconds (10 minutes) - this is the value our system uses.
+
+### Save Changes
+   Confirm and save your DNS configuration.
+
+</Steps>
+
+**Important Note:** Do not use an A record with Heroku. Heroku's infrastructure uses dynamic IP addresses, so you must use a CNAME record pointing to their stable DNS target.
+
+## Step 3: Automatic SSL Certificate Provisioning
+
+If your Heroku app is on a paid dyno type (Hobby, Standard, Performance), Heroku automatically provisions and manages SSL certificates for custom domains added via the `domains:add` command (Automated Certificate Management - ACM).
+
+<Steps>
+
+### Check SSL Status
+   You can check the status of your SSL certificate in Heroku:
+   ```bash
+   heroku certs:auto --app your-heroku-app-name
+   ```
+   It might take some time (from a few minutes to an hour) after the CNAME record propagates for Heroku to verify domain control and issue the certificate.
+
+</Steps>
+
+For apps on free dynos, custom domains are supported, but you'll need to use a third-party service like Cloudflare for SSL if HTTPS is required, as Heroku ACM is not available for free dynos.
+
+## Step 4: Wait for DNS Propagation
+
+Our platform sets a TTL of 10 minutes (600 seconds) for your DNS records. This advises DNS servers globally to cache your record for 10 minutes before checking for updates.
+
+*   **Propagation Time:** While our TTL is 10 minutes, allow 10-60 minutes for the CNAME record to propagate widely and for Heroku to complete its verification and SSL provisioning.
+*   **Verification:** Once propagated, try accessing `https://your.subdomain.com`. Use an online DNS checker to confirm the CNAME record is resolving to the Heroku DNS target.
+
+## Troubleshooting
+
+<Steps>
+
+### Verify CNAME Record
+   Ensure the CNAME record's "Name/Host" is just your subdomain (e.g., `www`) and the "Value/Target" is the exact `.herokudns.com` address Heroku provided.
+
+### Heroku Domain Status
+   Run `heroku domains --app your-heroku-app-name`. Check the status of your custom domain. It should not show any errors.
+
+### Heroku SSL Status
+   Run `heroku certs:auto --app your-heroku-app-name`. Look for `Status: OK`. If it says `Failing` or is stuck, there might be an issue with DNS propagation or the CNAME record.
+
+### Propagation Delays
+   DNS changes can take time. If you just made the changes, wait a bit longer.
+
+### App Not Responding
+   If DNS is resolving correctly but your app isn't loading, check your Heroku app logs:
+   ```bash
+   heroku logs --tail --app your-heroku-app-name
+   ```
+
+### Using Root Domains
+   Heroku recommends using `www` or other subdomains. Pointing a root domain (e.g., `yourdomain.com`) directly to Heroku is more complex and often requires using a DNS provider that supports CNAME-like functionality at the root (like ALIAS, ANAME records, or CNAME flattening). Our platform might have specific ways to handle this if supported; otherwise, using `www` is simpler.
+
+</Steps>
+
+If issues persist, consult the Heroku Dev Center documentation. When contacting our support, please provide:
+*   Your domain name and the subdomain in question.
+*   Your Heroku app name.
+*   The DNS Target provided by Heroku.
+*   Screenshots of your DNS settings on our platform.
+*   The output of `heroku domains --app your-heroku-app-name` and `heroku certs:auto --app your-heroku-app-name`. 

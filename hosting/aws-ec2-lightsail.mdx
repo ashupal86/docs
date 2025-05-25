@@ -1,0 +1,67 @@
+---
+title: Connecting to AWS EC2 or Lightsail
+description: Point your Devinit subdomain to an AWS EC2 instance or Lightsail instance.
+---
+
+# Connecting to AWS EC2 or Lightsail
+
+Amazon Web Services (AWS) offers powerful and scalable computing resources. You can point your Devinit subdomain to an **EC2 (Elastic Compute Cloud) instance** or an **Amazon Lightsail instance**.
+
+*   **EC2 instances** are highly configurable virtual servers.
+*   **Lightsail instances** offer a simpler, bundled approach to virtual private servers, often including a static IP out-of-the-box.
+
+Always refer to the official AWS documentation for [EC2](https://aws.amazon.com/ec2/getting-started/) and [Lightsail](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-how-to-create-dns-entry) for the most detailed and up-to-date information.
+
+## Typical DNS Records Required
+
+For both EC2 and Lightsail instances, you will typically use an **A Record** pointing to the instance's public IP address.
+
+*   **EC2**: You need to ensure you have an **Elastic IP address** associated with your EC2 instance. Standard public IPs for EC2 instances can change if the instance is stopped and started. An Elastic IP is a static IPv4 address designed for dynamic cloud computing.
+*   **Lightsail**: Lightsail instances can easily be assigned a **static IP address** from the Lightsail console. This is highly recommended.
+
+## General Steps
+
+1.  **Obtain a Static Public IP Address for Your Instance**:
+    *   **For EC2**:
+        1.  In the AWS Management Console, navigate to EC2.
+        2.  Under "Network & Security," select "Elastic IPs."
+        3.  Allocate a new Elastic IP address if you don't have one.
+        4.  Associate this Elastic IP address with your running EC2 instance.
+    *   **For Lightsail**:
+        1.  In the Lightsail console, go to the "Networking" tab.
+        2.  Click "Create static IP."
+        3.  Attach the static IP to your desired Lightsail instance.
+    *   Copy the static IP address.
+
+2.  **Ensure Your Web Server/Application is Configured on the Instance**:
+    *   This step is performed **on your EC2/Lightsail instance itself**.
+    *   Install and configure a web server (e.g., Nginx, Apache, Caddy) on your instance.
+    *   Set up a virtual host (or server block/equivalent) for your specific Devinit subdomain (e.g., `mysubdomain.devinit.example.com`). This tells the web server which site to serve for requests to your subdomain.
+    *   Configure your instance's **Security Group (for EC2)** or **Firewall (for Lightsail)** to allow inbound traffic on port 80 (HTTP) and port 443 (HTTPS) from `0.0.0.0/0` (or be more restrictive if needed).
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to your AWS instance.
+    *   Set **Record Type** to `A`.
+    *   Set **Target Value** to the static public IP address of your EC2 or Lightsail instance (obtained in Step 1).
+    *   Click "Save Configuration".
+
+4.  **Wait for DNS Propagation**:
+    *   After saving in Devinit, the changes are sent to our DNS provider (Dynadot), which has a **10-minute TTL**. This means initial updates are fast from Dynadot's side.
+    *   However, full **global DNS propagation** (all DNS servers worldwide seeing the update) can take longer, from a few minutes to 48 hours, though typically much faster. Be patient during this period.
+    *   You can use online tools like [whatsmydns.net](https://whatsmydns.net/) to check propagation.
+
+5.  **Set up SSL/TLS Certificate (on your instance)**:
+    *   Once DNS is resolving, install an SSL/TLS certificate on your EC2/Lightsail instance (e.g., using Let's Encrypt with Certbot) to enable HTTPS. This is done on the server.
+
+## Troubleshooting
+
+*   **Subdomain Not Loading / Timeout / Server Not Found**: 
+    *   **DNS Propagation**: Allow adequate time (Step 4).
+    *   **Correct IP Address**: Ensure the A record in Devinit points to the correct **static/Elastic IP**.
+    *   **Security Group/Firewall**: This is a common AWS issue. Double-check your EC2 Security Group or Lightsail Firewall rules to ensure HTTP (port 80) and HTTPS (port 443) traffic is allowed from the internet.
+    *   **Web Server Configuration**: Verify your web server (Nginx, Apache) on the instance is running, correctly configured for your subdomain, and listening on the correct ports.
+    *   **Instance Status**: Make sure your EC2 or Lightsail instance is running and hasn't encountered any issues.
+*   **Using Default Public IP for EC2 (Not Elastic IP)**: If you didn't use an Elastic IP for EC2, the IP might have changed if you stopped/started the instance. Always use an Elastic IP for domains.
+
+**Consult the official AWS documentation for [EC2](https://docs.aws.amazon.com/ec2/index.html) and [Lightsail](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-instances) for detailed guides specific to those services.** 

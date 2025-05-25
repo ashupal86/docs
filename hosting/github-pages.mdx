@@ -1,0 +1,58 @@
+---
+title: Connecting to GitHub Pages
+description: Point your Devinit subdomain to a GitHub Pages site.
+---
+
+# Connecting Your Subdomain to GitHub Pages
+
+GitHub Pages allows you to host static websites directly from your GitHub repositories. You can use your Devinit subdomain with your GitHub Pages site.
+
+Always refer to the [official GitHub Pages documentation on custom domains](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) for the most detailed and up-to-date information.
+
+## Typical DNS Records Required by GitHub Pages
+
+For a custom subdomain (like `mysubdomain.devinit.example.com`), GitHub Pages typically requires a **CNAME record**.
+
+*   The CNAME record should point to your default GitHub Pages address, which is usually in the format `your-username.github.io` (for user/organization pages) or `your-username.github.io/repository-name` (for project pages, though you typically point the CNAME to just `your-username.github.io` and GitHub handles the repository part).
+
+GitHub also provides specific IP addresses for A records, but these are primarily for apex domains. For subdomains, using a CNAME is generally the recommended approach.
+
+## General Steps
+
+1.  **Configure Custom Domain in GitHub Repository Settings**:
+    *   Navigate to your GitHub repository that is configured for GitHub Pages.
+    *   Go to the repository's **Settings** tab.
+    *   In the left sidebar, click on **Pages**.
+    *   Under the "Custom domain" section, type your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`) into the field.
+    *   Click **Save**.
+    *   GitHub might create a `CNAME` file in the root of your repository with your custom subdomain in it. This is normal.
+
+2.  **Identify GitHub Pages DNS Target**:
+    *   The target for your CNAME record will be your default GitHub Pages domain, typically `your-username.github.io` or `your-organization.github.io`.
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to GitHub Pages.
+    *   Set **Record Type** to `CNAME`.
+    *   Set **Target Value** to your GitHub Pages default domain (e.g., `your-username.github.io`).
+    *   Click "Save Configuration".
+
+4.  **Verification and HTTPS**:
+    *   Go back to your GitHub repository's **Settings > Pages** section.
+    *   It might take some time for DNS changes to propagate and for GitHub to verify your custom domain. Our DNS provider (Dynadot) uses a **10-minute TTL**, meaning initial updates from Devinit are quick. However, global propagation for GitHub to fully verify can take from a few minutes to several hours (or longer in rare cases, up to 48 hours).
+    *   Once verified, GitHub Pages will attempt to provision an SSL certificate for your custom subdomain to enable HTTPS. This process can take a little while.
+    *   You should see a confirmation message like "Your site is published at [your custom subdomain]" once everything is set up.
+    *   You can also often check the "Enforce HTTPS" option.
+
+## Troubleshooting
+
+*   **"Domain not yet verified" / HTTPS Not Available**: 
+    *   DNS propagation can take time (see point 4 for details). Wait up to 24-48 hours, though it's usually much faster.
+    *   Double-check that your CNAME record in Devinit is correctly pointing to `your-username.github.io`.
+    *   Ensure the custom domain name in your GitHub Pages settings exactly matches your Devinit subdomain.
+    *   Make sure the `CNAME` file in your repository (if it exists) contains the correct custom subdomain.
+*   **Page Not Found (404) after setup**: 
+    *   Verify your GitHub Pages site is correctly building and deploying from the branch you've selected (e.g., `main`, `gh-pages`).
+    *   Ensure your `index.html` (or other entry file) is at the root of the publishing source.
+
+**Always consult the [official GitHub Pages documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) for the most comprehensive and current instructions.** 

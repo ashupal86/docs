@@ -1,0 +1,51 @@
+---
+title: Connecting to Render
+description: Point your Devinit subdomain to a Render service.
+---
+
+# Connecting Your Subdomain to Render
+
+Render is a cloud platform for building and running applications and websites. You can easily connect your Devinit subdomain to services hosted on Render.
+
+For the most accurate and detailed instructions, always refer to the [official Render documentation on custom domains](https://render.com/docs/custom-domains).
+
+## Typical DNS Records Required by Render
+
+Render typically uses **CNAME records** for custom subdomains pointing to your Render service's onrender.com address. They may also provide IP addresses for **A records** if needed, particularly for apex domains (though for your Devinit subdomains, CNAME is most common).
+
+*   **For Web Services, Static Sites, etc. (Subdomains)**: Render will usually provide a target hostname like `your-service.onrender.com` for you to use in a **CNAME record**.
+
+## General Steps
+
+1.  **Add Your Custom Subdomain in Render**:
+    *   Go to your Render dashboard and select the service (e.g., Web Service, Static Site) you want to connect.
+    *   Navigate to the **Settings** tab for that service.
+    *   Find the "Custom Domains" section and click "Add Custom Domain."
+    *   Enter your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`) and click "Save" or "Add."
+
+2.  **Identify Render's DNS Configuration**:
+    *   After adding your subdomain, Render will display the DNS records you need to configure. 
+    *   For a subdomain, this is typically a **CNAME record** with a **Target/Value** like `your-service-name.onrender.com`.
+    *   Render will also usually perform a check and show the status of your domain verification.
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to Render.
+    *   Set **Record Type** to `CNAME`.
+    *   Set **Target Value** to the hostname provided by Render (e.g., `your-service-name.onrender.com`).
+    *   Click "Save Configuration".
+
+4.  **Verification in Render**:
+    *   Return to your Render service's custom domain settings.
+    *   Render will automatically check for the DNS record. Our DNS provider (Dynadot) applies a **10-minute TTL**, so the initial update from Devinit is fast. However, full global propagation for Render to verify can take from a few minutes to several hours (rarely up to 48 hours) depending on DNS caching worldwide. Patience is key during this period.
+    *   Once Render verifies the DNS record, it will issue an SSL certificate, and your subdomain will be active and pointing to your Render service.
+
+## Troubleshooting
+
+*   **Render shows "DNS Not Configured" or similar**:
+    *   Double-check that the CNAME record in Devinit points exactly to the `.onrender.com` address provided by Render.
+    *   Ensure there are no typos.
+    *   Allow sufficient time for DNS propagation (see point 4). Use an online DNS checker tool if needed.
+*   **SSL Certificate Pending/Failed**: This usually resolves once DNS is correctly propagated and verified by Render. If it persists, re-check your DNS settings in Devinit.
+
+**Always consult the [official Render documentation](https://render.com/docs/custom-domains) for the latest and most detailed instructions.** 

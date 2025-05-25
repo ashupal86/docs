@@ -1,0 +1,118 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Google Cloud Platform (GCP)
+
+Connecting your custom subdomain to services on Google Cloud Platform (GCP) involves configuring DNS records to point to your GCP resources. This guide provides general steps, as specific configurations can vary based on the GCP service you're using (e.g., Compute Engine, Cloud Run, App Engine, Cloud Storage).
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   An active GCP account and a deployed application or resource you want to connect.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Identify Your GCP Resource's IP Address or Hostname
+
+Depending on the GCP service, you'll need either an IP address or a CNAME target.
+
+<Steps>
+
+### For Compute Engine (VMs)
+   You will typically use the external IP address of your VM instance.
+
+### For Cloud Run or App Engine
+   GCP will provide a specific hostname (e.g., `*.run.app` or `*.appspot.com`) that you'll use as a CNAME target. You might also need to map your custom domain within the GCP console for that service.
+
+### For Cloud Storage (Static Website)
+   If serving a static website, you might configure a CNAME record pointing to `c.storage.googleapis.com.` or use a load balancer with an IP address.
+
+</Steps>
+
+Refer to the specific documentation for your chosen GCP service to find the correct IP address or hostname.
+
+## Step 2: Add DNS Records on Our Platform
+
+Once you have the necessary information from GCP:
+
+<Steps>
+
+### Log in to Your Account
+   Access your dashboard on our platform.
+
+### Navigate to DNS Management
+   Select the domain you wish to configure.
+
+### Add DNS Records
+
+*   **For an IP Address (A Record):**
+    *   **Type:** `A`
+    *   **Name/Host:** Your desired subdomain (e.g., `www`, `app`, or leave blank for the root domain if supported by GCP for your use case, though subdomains are more common).
+    *   **Value/Target:** The external IP address of your GCP resource.
+    *   **TTL:** 600 seconds (10 minutes) - this is the value our system uses.
+
+*   **For a Hostname (CNAME Record):**
+    *   **Type:** `CNAME`
+    *   **Name/Host:** Your desired subdomain (e.g., `www`, `app`).
+    *   **Value/Target:** The hostname provided by GCP (e.g., `ghs.googlehosted.com` for App Engine, or your service-specific URL for Cloud Run).
+    *   **TTL:** 600 seconds (10 minutes) - this is the value our system uses.
+
+### Save Changes
+   Confirm and save your DNS record configurations.
+
+</Steps>
+
+## Step 3: Configure Custom Domain in GCP (If Required)
+
+Many GCP services require you to register your custom domain/subdomain within the GCP console for that specific service.
+
+*   **Cloud Run:** Go to your service, select "Custom Domains," and add your domain. GCP will often ask you to verify domain ownership by adding a specific TXT record.
+*   **App Engine:** Navigate to Settings > Custom Domains and add your domain. Verification might also be required.
+*   **Load Balancers:** When using a Google Cloud Load Balancer, you'll configure it with your SSL certificate and associate it with your custom domain.
+
+Follow the instructions provided by GCP for domain verification and mapping. This might involve adding additional TXT or CNAME records temporarily.
+
+## Step 4: Wait for DNS Propagation
+
+DNS changes can take time to propagate globally. Our platform sets a TTL of 10 minutes (600 seconds) for DNS records you manage with us. This means that DNS servers around the world are instructed to cache your record for 10 minutes before checking for updates.
+
+*   **Initial Propagation:** While our TTL is 10 minutes, global propagation can sometimes take longer, from a few minutes up to a few hours in rare cases, depending on how various DNS resolvers honor TTLs.
+*   **Verification:** After about 10-30 minutes, try accessing your subdomain. You can use online DNS checker tools to see if the new records are visible from different locations.
+
+## Step 5: SSL/TLS Certificates
+
+Ensure you have an SSL/TLS certificate configured for your custom domain in GCP. 
+*   **Google-Managed Certificates:** Many GCP services (like Cloud Run, App Engine, Load Balancers) offer Google-managed SSL certificates, which are automatically provisioned and renewed. This is often the easiest approach.
+*   **Self-Managed Certificates:** You can also upload your own certificates if needed.
+
+## Troubleshooting
+
+<Steps>
+
+### Double-Check DNS Records
+   Ensure the A or CNAME record values exactly match what GCP provided. Typos are common.
+
+### GCP Service Configuration
+   Verify that the custom domain is correctly added and verified within the specific GCP service settings.
+
+### Propagation Delays
+   Be patient. If it's been less than an hour, it might still be propagating.
+
+### Mixed Content Warnings
+   If your site loads but has issues, check for mixed content warnings (HTTP resources on an HTTPS page).
+
+### GCP Firewall Rules
+   For Compute Engine, ensure your firewall rules allow traffic on HTTP (80) and HTTPS (433) from the internet (`0.0.0.0/0`).
+
+### Check GCP Documentation
+   GCP's documentation for the specific service you are using will have the most accurate and detailed instructions.
+
+</Steps>
+
+If you continue to experience issues, please gather the following information before contacting support:
+*   Your domain name.
+*   The subdomain you are trying to configure.
+*   The GCP service you are using.
+*   Screenshots of your DNS records on our platform.
+*   Screenshots of your custom domain configuration in GCP.
+*   Any error messages you are seeing.
+
+This will help our support team diagnose the problem more quickly. 

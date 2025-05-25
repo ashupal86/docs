@@ -1,0 +1,112 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Azure Static Web Apps
+
+Azure Static Web Apps is a service that automatically builds and deploys full-stack web apps to Azure from a code repository. Adding a custom subdomain enhances your app's professionalism.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A deployed Azure Static Web App.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Add Custom Domain in Azure Static Web Apps Portal
+
+<Steps>
+
+### Navigate to Your Static Web App
+   In the Azure portal, find and select your Azure Static Web App.
+
+### Go to Custom Domains
+   In the navigation menu for your Static Web App, select "Custom domains."
+
+### Add Custom Domain
+   Click "+ Add." In the flyout, enter your full custom subdomain (e.g., `www.yourdomain.com` or `app.yourdomain.com`) in the "Custom domain" field.
+
+### Validation Method
+   Azure Static Web Apps typically uses CNAME-based validation. After you enter your subdomain and click "Next" or "Validate," Azure will provide you with the specific CNAME record details you need to add to your DNS provider.
+   *   **Hostname/Alias:** This will be your subdomain (e.g., `www`, `app`).
+   *   **Points to/Value:** An Azure-generated validation hostname (e.g., `xxxxxxxx-xxxx.staticsites.xxxxxx.net` or similar, specific to your app and region).
+
+   It might also show a TXT record for validation as an alternative or additional step, especially for root domains if you are trying to set one up (though subdomains are more straightforward).
+
+</Steps>
+
+Carefully copy the CNAME record (Host and Value) provided by Azure.
+
+## Step 2: Add DNS Records on Our Platform
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard on our platform and go to the DNS management for your domain.
+
+### Add CNAME Record for Validation and Routing
+   *   **Type:** `CNAME`
+   *   **Name/Host:** Your subdomain (e.g., `www`, `app`).
+   *   **Value/Target:** The Azure-generated hostname provided in the Static Web Apps portal (e.g., `xxxxxxxx-xxxx.staticsites.xxxxxx.net`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### (If Applicable) Add TXT Record for Verification
+   If Azure also provided a TXT record for verification:
+   *   **Type:** `TXT`
+   *   **Name/Host:** As specified by Azure (often `_asuid.yoursubdomain` or the subdomain itself).
+   *   **Value/Target:** The verification code provided by Azure.
+   *   **TTL:** 600 seconds (10 minutes) or 3600 (1 hour).
+
+### Save Changes
+   Apply the DNS configurations on our platform.
+
+</Steps>
+
+## Step 3: Validate in Azure and Wait for SSL
+
+<Steps>
+
+### Return to Azure Portal
+   Go back to the "Custom domains" section of your Static Web App in the Azure portal.
+
+### Validation Process
+   Azure will automatically try to validate the CNAME record once DNS propagation occurs. The status of your custom domain will update.
+   There might be a "Validate" button to click, or it might happen automatically. If you added the custom domain and it's pending, wait for DNS to propagate, then revisit this page.
+
+### SSL Certificate Provisioning
+   Once Azure successfully validates your CNAME record, it automatically provisions a free SSL/TLS certificate for your custom subdomain and enables HTTPS. This process is usually quick (minutes to an hour) after successful validation.
+   The status should change to "Secured" or similar.
+
+</Steps>
+
+## Step 4: Test Your Subdomain
+
+Once Azure shows the custom domain as validated/secured and the SSL certificate is active, try accessing `https://your.subdomain.com`.
+
+## Troubleshooting
+
+<Steps>
+
+### Verify CNAME Record Details
+   The Name/Host (your subdomain) and Value/Target (the Azure hostname) for the CNAME record must be an exact match to what Azure provided. Typos are very common.
+
+### Azure Portal Status
+   The "Custom domains" section in your Static Web App is the best place to check the status. It will indicate if validation is pending, failed, or successful.
+
+### DNS Propagation Time
+   Allow sufficient time (10-60 minutes, sometimes more) for DNS changes to propagate globally. Use online DNS checker tools to see if the CNAME record is resolving correctly to the Azure target.
+
+### Case Sensitivity (for TXT records)
+   If a TXT record was involved, ensure the value is an exact match, including case.
+
+### Conflicting DNS Records
+   Ensure no other CNAME, A, or AAAA records exist for the *exact* same subdomain. A CNAME record cannot coexist with other records for the same hostname (except for DNSSEC-related records like NSEC).
+
+### Static Web App Region
+   The target hostname for the CNAME record is specific to your Static Web App instance and its region.
+
+</Steps>
+
+If issues persist:
+*   Refer to the official Azure Static Web Apps documentation on custom domains.
+*   Check Azure Service Health for any platform issues.
+*   When contacting our support, provide your domain, the subdomain, screenshots of the CNAME (and any TXT) record details provided by Azure, and screenshots of your DNS settings on our platform, along with any status messages from the Azure portal.
+
+Content coming soon. 

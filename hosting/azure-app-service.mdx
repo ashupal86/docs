@@ -1,0 +1,132 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Azure App Service
+
+Azure App Service enables you to build and host web applications, RESTful APIs, and mobile backends. Using a custom subdomain allows you to brand your App Service application.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   An Azure App Service plan (Basic tier or higher for SSL with custom domains, though some custom domain features work on Free/Shared for non-production).
+*   A deployed web app in Azure App Service.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Get App Service Default Hostname & Prepare for Verification
+
+<Steps>
+
+### Find App Service Default Hostname
+   In the Azure portal, navigate to your App Service. On the "Overview" page, you'll find its default URL (e.g., `yourapp.azurewebsites.net`). This is important for one of the CNAME records.
+
+### Prepare for Domain Verification
+   Azure needs to verify that you own the custom domain. It does this by having you create specific DNS records. Typically, you will need the `asuid` (Azure Service Unique ID) for your App Service. You can often find this when you start the custom domain adding process in Azure, or it's derived from your App Service configuration.
+
+</Steps>
+
+## Step 2: Add Custom Domain in Azure App Service
+
+<Steps>
+
+### Navigate to Custom Domains
+   In your App Service in the Azure portal, go to "Custom domains" under the "Settings" section.
+
+### Add Custom Domain
+   Click "+ Add custom domain."
+   *   Enter your full custom subdomain (e.g., `www.yourdomain.com` or `app.yourdomain.com`).
+   *   Click "Validate."
+
+### Validation Records
+   Azure will now display the DNS records you need to add to prove ownership and to route traffic. This typically includes:
+   1.  **TXT Record for Domain Ownership Verification:**
+       *   **Host:** `asuid.yoursubdomain` (e.g., if your subdomain is `www`, it would be `asuid.www`).
+       *   **Value:** A unique verification ID tied to your App Service (often related to the `yourapp.azurewebsites.net` domain or a specific ID shown in the portal).
+   2.  **CNAME Record to Route Traffic:**
+       *   **Host:** Your subdomain (e.g., `www`).
+       *   **Value:** Your App Service's default hostname (e.g., `yourapp.azurewebsites.net`).
+
+   Keep these values. You will add them to your DNS provider (our platform).
+
+</Steps>
+
+## Step 3: Add DNS Records on Our Platform
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard on our platform and go to the DNS management for your domain.
+
+### Add TXT Record for Verification
+   *   **Type:** `TXT`
+   *   **Name/Host:** `asuid.yoursubdomain` (e.g., `asuid.www` or `asuid.app`). Azure will specify the exact host.
+   *   **Value/Target:** The verification ID provided by Azure.
+   *   **TTL:** 600 seconds (10 minutes) or 3600 (1 hour) as Azure might recommend.
+
+### Add CNAME Record for Traffic Routing
+   *   **Type:** `CNAME`
+   *   **Name/Host:** Your subdomain (e.g., `www`, `app`).
+   *   **Value/Target:** Your App Service's default hostname (e.g., `yourapp.azurewebsites.net`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### Save Changes
+   Apply the DNS configurations.
+
+</Steps>
+
+## Step 4: Validate and Add Binding in Azure
+
+<Steps>
+
+### Re-Validate in Azure
+   Return to the Azure portal ("Custom domains" section of your App Service). After DNS propagation (allow some time), click "Validate" again for your custom domain. If the DNS records are correct and propagated, the hostname ownership and service availability should turn green.
+
+### Add Hostname Binding
+   Once validated, click the "Add custom domain" button (which might now be enabled or change text to something like "Add binding"). This action binds the validated custom domain to your App Service.
+
+### Configure SSL/TLS (Binding)
+   After the binding is added, you can secure your custom domain with SSL.
+   *   Select the custom domain in the list.
+   *   Click "Add SSL binding."
+   *   You can upload your own certificate or, if your App Service plan supports it, create a free App Service Managed Certificate.
+   *   Choose the certificate and the SSL type (SNI SSL is common).
+   *   Click "Add binding."
+
+</Steps>
+
+## Step 5: Wait for DNS Propagation & Test
+
+<Steps>
+
+### DNS Propagation
+   Our platform uses a 10-minute (600 seconds) TTL. Global propagation can take 10-60 minutes or more.
+
+### Test Your Subdomain
+   Once Azure shows the domain binding as successful and SSL is configured, try accessing `https://your.subdomain.com`.
+
+</Steps>
+
+## Troubleshooting
+
+<Steps>
+
+### Verify DNS Record Values
+   The TXT record host (`asuid.subdomain`) and value, and the CNAME record host (subdomain) and value (`yourapp.azurewebsites.net`) must be exact.
+
+### Azure Portal Validation Errors
+   The Azure portal usually provides specific error messages if validation fails (e.g., "CNAME record not found").
+
+### Propagation Delays
+   Give DNS changes ample time. Use online DNS checkers to see if the records are visible publicly.
+
+### App Service Plan Tier
+   Some features, like App Service Managed Certificates, require specific App Service plan tiers (Basic or higher). Free/Shared tiers have limitations on custom domains and SSL.
+
+### Conflicting DNS Records
+   Ensure no other CNAME exists for the same subdomain. An A record for the same subdomain can also sometimes cause issues if not intended (though for App Service, CNAME is standard).
+
+</Steps>
+
+If issues persist:
+*   Consult the official Azure App Service documentation on mapping custom domains.
+*   Check the Azure Service Health dashboard.
+*   When contacting our support, provide your domain, subdomain, screenshots of DNS records specified by Azure, screenshots of your DNS setup on our platform, and status messages from the Azure portal.
+</rewritten_file> 

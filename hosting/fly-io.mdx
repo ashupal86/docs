@@ -1,0 +1,119 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Fly.io
+
+Fly.io makes it easy to deploy applications globally. Connecting a custom subdomain involves pointing your DNS records to Fly.io's infrastructure.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A deployed application on Fly.io.
+*   Access to your domain's DNS settings on our platform.
+*   Fly CLI (`flyctl`) installed and authenticated.
+
+## Step 1: Add Your Custom Domain to Your Fly.io App
+
+Fly.io needs to know about your custom domain before it can serve traffic for it.
+
+<Steps>
+
+### List Your Apps
+   Use `flyctl apps list` to find the name of your application if you're unsure.
+
+### Add a Certificate for Your Domain
+   Fly.io automatically provisions SSL certificates for custom domains. You first need to tell Fly which hostname you want to use.
+   ```bash
+   flyctl certs create your.subdomain.com
+   ```
+   Replace `your.subdomain.com` with the actual subdomain you want to use (e.g., `app.yourdomain.com`).
+
+### Note Fly.io DNS Configuration
+   After running the command, `flyctl` will output the DNS records you need to set up. This usually includes:
+   *   An **A record** pointing to Fly.io's Anycast IP address.
+   *   A **AAAA record** pointing to Fly.io's Anycast IPv6 address.
+   *   Sometimes, a **CNAME record** for `fly-verification` or similar, for domain verification.
+
+   Alternatively, you can run `flyctl domains show your.subdomain.com` or `flyctl certs show your.subdomain.com` to get this information after adding the certificate.
+
+</Steps>
+
+Keep the output from these commands handy for the next step.
+
+## Step 2: Add DNS Records on Our Platform
+
+Now, configure the DNS records in your domain registrar's control panel (our platform).
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard and go to the DNS management section for your domain.
+
+### Add the DNS Records Provided by Fly.io
+
+*   **A Record:**
+    *   **Type:** `A`
+    *   **Name/Host:** Your subdomain (e.g., `app`, `www`).
+    *   **Value/Target:** The IPv4 address provided by Fly.io.
+    *   **TTL:** 600 seconds (10 minutes).
+
+*   **AAAA Record:**
+    *   **Type:** `AAAA`
+    *   **Name/Host:** Your subdomain (e.g., `app`, `www`).
+    *   **Value/Target:** The IPv6 address provided by Fly.io.
+    *   **TTL:** 600 seconds (10 minutes).
+
+*   **CNAME Record for Verification (if provided):**
+    *   Fly.io might require a CNAME record for verification (e.g., `_fly._dnsauth.your.subdomain.com` or similar pattern like `fly-verification.your.subdomain.com`).
+    *   **Type:** `CNAME`
+    *   **Name/Host:** The full name provided by Fly.io (e.g., `_fly._dnsauth.app` if your subdomain is `app`).
+    *   **Value/Target:** The target value provided by Fly.io.
+    *   **TTL:** 600 seconds (10 minutes).
+
+### Save Changes
+   Confirm and save your DNS configurations.
+
+</Steps>
+
+## Step 3: Verify Domain with Fly.io
+
+Fly.io will automatically attempt to verify your domain ownership and issue an SSL certificate once the DNS records are correctly propagated.
+
+<Steps>
+
+### Check Verification Status
+   You can check the status using `flyctl certs show your.subdomain.com`.
+   Look for confirmation that the domain is verified and the certificate is issued. This might take a few minutes after DNS propagation.
+
+</Steps>
+
+## Step 4: Wait for DNS Propagation
+
+Our platform sets a TTL of 10 minutes (600 seconds) for your DNS records. This means DNS servers worldwide are instructed to cache your records for 10 minutes before refreshing.
+
+*   **Initial Propagation:** While our TTL is 10 minutes, allow 10-30 minutes for changes to become widely visible. Global propagation can sometimes take longer.
+*   **Verification:** After waiting, try accessing `https://your.subdomain.com`. You can also use online DNS checker tools.
+
+## Troubleshooting
+
+<Steps>
+
+### Double-Check DNS Records
+   Ensure the A, AAAA, and any CNAME records match *exactly* what `flyctl` provided. Typos are critical.
+
+### Fly.io Verification Status
+   Run `flyctl certs show your.subdomain.com` again. It will often give clues if there's a mismatch or if it's still waiting for DNS.
+   The command `flyctl doctor` can also sometimes help diagnose general issues with your app configuration.
+
+### Propagation Delays
+   If it's been less than an hour, DNS might still be propagating. Patience is key.
+
+### Check Fly.io Logs
+   Use `flyctl logs -a your-app-name` to see if your application is receiving traffic or if there are errors at the application level once DNS resolves.
+
+</Steps>
+
+If you encounter persistent issues:
+*   Ensure `flyctl` is updated (`flyctl version update`).
+*   Consult the Fly.io documentation and community forums.
+*   When contacting our support, provide your domain, subdomain, the output of `flyctl certs show your.subdomain.com`, and screenshots of your DNS settings on our platform.
+</rewritten_file> 

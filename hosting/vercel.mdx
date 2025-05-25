@@ -1,0 +1,58 @@
+---
+title: Connecting to Vercel
+description: Point your Devinit subdomain to a Vercel project.
+---
+
+# Connecting Your Subdomain to Vercel
+
+Vercel is a popular platform for hosting frontend projects and serverless functions. Connecting your Devinit subdomain to a Vercel project is straightforward.
+
+Refer to the [official Vercel documentation on custom domains](https://vercel.com/docs/projects/domains/custom-domains) for the most up-to-date and detailed instructions.
+
+## Typical DNS Records Required by Vercel
+
+Vercel generally uses **CNAME records** for custom subdomains, but can also use **A records**.
+
+*   **For non-apex (sub)domains (like `mysubdomain.devinit.example.com`)**: Vercel usually recommends a **CNAME record** pointing to `cname.vercel-dns.com`.
+*   **Alternatively, for any domain type**: Vercel provides an **A record** IP address: `76.76.21.21`.
+
+Often, Vercel will guide you to use the CNAME record for subdomains as it can offer more flexibility with their infrastructure. However, the A record is also a valid option they provide.
+
+## General Steps
+
+1.  **Add Your Custom Subdomain in Vercel**:
+    *   Go to your Vercel project's dashboard.
+    *   Navigate to the **Settings** tab.
+    *   Select the **Domains** menu.
+    *   Enter your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`) and click "Add".
+
+2.  **Identify Vercel's Recommended Configuration**:
+    *   Vercel will then display the recommended DNS configuration. It will usually suggest:
+        *   **Option 1 (Recommended for Subdomains):** A CNAME record pointing to `cname.vercel-dns.com`.
+        *   **Option 2 (Alternative):** An A record pointing to `76.76.21.21`.
+    *   It might also show a TXT record for verification if adding the domain for the first time, which you should add first if prompted.
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to Vercel.
+    *   **If using CNAME (recommended by Vercel for subdomains)**:
+        *   Set **Record Type** to `CNAME`.
+        *   Set **Target Value** to `cname.vercel-dns.com`.
+    *   **If using A Record**:
+        *   Set **Record Type** to `A`.
+        *   Set **Target Value** to `76.76.21.21`.
+    *   Click "Save Configuration".
+
+4.  **Verification in Vercel**:
+    *   Go back to your Vercel project's domain settings.
+    *   Vercel will automatically attempt to verify the DNS records. Our DNS provider (Dynadot) has a **10-minute TTL**. This means initial updates are fast from our end, but global propagation for Vercel to fully verify can take from a few minutes up to a few hours (or longer in rare cases, up to 48 hours). Be patient during this period.
+    *   Once verified, the status in Vercel will update, and your subdomain should point to your Vercel deployment.
+
+## Troubleshooting
+
+*   **Vercel shows "Invalid Configuration"**:
+    *   Double-check that the CNAME or A record value you entered in Devinit matches exactly what Vercel provided.
+    *   Allow sufficient time for DNS propagation (see point 4 above). You can use a tool like [whatsmydns.net](https://whatsmydns.net/) to check the CNAME or A record for your subdomain.
+*   **"This domain is already in use by another Vercel account/project"**: You'll need to remove the domain from the other Vercel project or contact Vercel support if you believe this is an error.
+
+**Always consult the [official Vercel documentation](https://vercel.com/docs/projects/domains/custom-domains) for the latest information.** 

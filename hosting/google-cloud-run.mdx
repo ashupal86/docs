@@ -1,0 +1,113 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Google Cloud Run
+
+Google Cloud Run is a managed platform that enables you to run stateless containers that are invocable via web requests or Pub/Sub events. Connecting a custom subdomain allows you to use your own branding.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A deployed service on Google Cloud Run.
+*   Access to your domain's DNS settings on our platform.
+*   `gcloud` CLI installed and configured, or access to the Google Cloud Console.
+
+## Step 1: Map Custom Domain in Google Cloud Run
+
+Cloud Run needs to be configured to serve traffic for your custom domain.
+
+<Steps>
+
+### Navigate to Cloud Run in GCP Console
+   Open the Google Cloud Console and go to the Cloud Run section. Select your project and then your service.
+
+### Add Custom Domain Mapping
+   Click on your service, then go to the "Triggers" tab or look for a "Custom Domains" or "Map Custom Domain" option (the location might vary slightly with console updates).
+   *   Click "Add mapping" or "Map Custom Domain."
+   *   Select your verified domain from the dropdown. If your domain is not yet verified with Google, you will be prompted to verify it first using Google Search Console (or by adding a TXT record). This is a one-time step per root domain.
+   *   Enter the subdomain you want to map (e.g., `app`, `api`, `www`).
+   *   Cloud Run will then display the DNS records you need to add to your DNS provider. These are typically A and AAAA records pointing to Google Front End (GFE) IP addresses, or sometimes a CNAME if your service is regional and not global.
+
+### Note the DNS Records
+   Carefully copy the DNS records (Record Type, Name/Host, Value/Target) provided by Cloud Run. For global Cloud Run services, these are usually anycast A and AAAA records. For regional services, it might be a CNAME pointing to `ghs.googlehosted.com` or a regional endpoint.
+
+</Steps>
+
+## Step 2: Add DNS Records on Our Platform
+
+Using the records provided by Google Cloud Run:
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard on our platform and go to the DNS management for your domain.
+
+### Add A and AAAA Records (Typical for Global Cloud Run)
+   If Cloud Run provided A and AAAA records:
+   *   **For A Records (usually multiple):**
+        *   **Type:** `A`
+        *   **Name/Host:** Your subdomain (e.g., `app`).
+        *   **Value/Target:** Each IPv4 address provided by Google.
+        *   **TTL:** 600 seconds (10 minutes).
+   *   **For AAAA Records (usually multiple):**
+        *   **Type:** `AAAA`
+        *   **Name/Host:** Your subdomain (e.g., `app`).
+        *   **Value/Target:** Each IPv6 address provided by Google.
+        *   **TTL:** 600 seconds (10 minutes).
+
+### Add CNAME Record (If specified, e.g., for some regional services)
+   If Cloud Run provided a CNAME target:
+   *   **Type:** `CNAME`
+   *   **Name/Host:** Your subdomain (e.g., `app`).
+   *   **Value/Target:** The CNAME target (e.g., `ghs.googlehosted.com`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### Save Changes
+   Apply the DNS configurations.
+
+</Steps>
+
+## Step 3: Wait for DNS Propagation and SSL Provisioning
+
+<Steps>
+
+### DNS Propagation
+   Our platform uses a 10-minute (600 seconds) TTL. Allow 10-30 minutes for these DNS changes to propagate globally. It can sometimes take longer.
+
+### SSL Certificate Activation
+   Once Google detects that the DNS records are correctly pointing to its infrastructure, it will automatically provision and install an SSL/TLS certificate for your custom subdomain. This process is usually quick but can take up to an hour.
+   You can check the status of the domain mapping in the Cloud Run console. It will typically show "Verifying" or "Provisioning certificate" and then become "Active" or show a green checkmark.
+
+</Steps>
+
+## Step 4: Test Your Subdomain
+
+Once the domain mapping is active and SSL is provisioned in the Cloud Run console, try accessing `https://your.subdomain.com`.
+
+## Troubleshooting
+
+<Steps>
+
+### Verify DNS Record Values
+   Ensure A, AAAA, or CNAME records exactly match what Google Cloud Run provided. Pay attention to the subdomain part (Name/Host).
+
+### Domain Verification with Google
+   If you were prompted to verify your domain with Google (e.g., via Search Console or a TXT record), ensure this step was completed successfully. Custom domain mapping in Cloud Run often depends on this prior verification of the parent domain.
+
+### Cloud Run Mapping Status
+   Check the status in the Cloud Run service's "Custom Domains" or "Triggers" tab. It will indicate if there are issues with DNS or SSL provisioning.
+
+### Propagation Delays
+   DNS can take time. Use online DNS propagation checkers.
+
+### IAM Permissions
+   Ensure the account performing the mapping has the necessary IAM roles (e.g., Cloud Run Admin, Domain Verified Owner).
+
+### Regional vs. Global Services
+   The type of DNS records (A/AAAA vs. CNAME) can differ based on whether your Cloud Run service is global or regional. Ensure you're using the records appropriate for your setup.
+
+</Steps>
+
+If issues persist:
+*   Consult the official Google Cloud Run documentation on custom domains.
+*   Check Google Cloud Status Dashboard for any ongoing incidents.
+*   When contacting our support, provide your domain, subdomain, screenshots of DNS records provided by Cloud Run, and screenshots of your DNS setup on our platform, along with any status messages from the GCP console. 

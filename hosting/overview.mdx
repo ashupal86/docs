@@ -1,0 +1,56 @@
+---
+title: Connecting to Hosting Providers - Overview
+description: General guidance on pointing your Devinit subdomain to various hosting services.
+---
+
+# Connecting to Hosting Providers: Overview
+
+Once you've registered a subdomain with Devinit (e.g., `mysubdomain.devinit.example.com`) and configured its basic DNS settings (like an A, CNAME, or TXT record via your Devinit profile), you'll often want to point this subdomain to a specific hosting provider where your website, application, or service resides.
+
+This section provides general guidance and links to specific instructions for popular hosting platforms.
+
+## Key Concepts
+
+When connecting your subdomain to a hosting provider, you'll typically use one of two main DNS record types through your Devinit profile's DNS configuration section:
+
+1.  **A Record**: 
+    *   **What it does**: Points your subdomain directly to an **IP Address** (e.g., `192.0.2.123`).
+    *   **When to use**: Your hosting provider gives you a static IP address for your server or application.
+    *   **In Devinit**: Select `A` as the Record Type and enter the IP address as the Target Value.
+
+2.  **CNAME Record** (Canonical Name):
+    *   **What it does**: Points your subdomain to **another domain name** (e.g., `target.somehosting.com` or `cname.vercel-dns.com`). This is like an alias.
+    *   **When to use**: Your hosting provider gives you a target hostname to point to. This is common for PaaS (Platform as a Service) providers like Vercel, Netlify, Render, Heroku, GitHub Pages, etc., as their underlying IP addresses can change.
+    *   **In Devinit**: Select `CNAME` as the Record Type and enter the target hostname (e.g., `target.somehosting.com`) as the Target Value.
+
+3.  **TXT Records for Verification (Sometimes)**:
+    *   Some hosting providers might first require you to add a TXT record to verify your ownership of the subdomain before you can point it using A or CNAME records. Follow their specific instructions if this is the case. You can add TXT records through your Devinit profile as well.
+
+## General Steps
+
+While the exact steps vary by provider, here's a general workflow:
+
+1.  **Initiate Custom Domain Setup on Your Hosting Provider**: Log in to your hosting provider's dashboard and find the section for adding or managing custom domains for your project/site/application.
+2.  **Enter Your Full Subdomain**: Provide your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`).
+3.  **Get DNS Values from Hosting Provider**: Your hosting provider will then display the necessary DNS record information. This will typically be:
+    *   An **IP address** (for an A record).
+    *   A **target hostname** (for a CNAME record).
+    *   Sometimes, they might also provide specific host/name values for the record, but for a subdomain managed through Devinit, your "host" is already defined by the subdomain itself (e.g., `mysubdomain`). You usually only need to worry about the Record Type and Target Value in your Devinit profile.
+4.  **Add/Update Records in Devinit**: Go to your Devinit Profile Page, find your subdomain, and enter the Record Type and Target Value obtained from your hosting provider. Click "Save Configuration".
+5.  **Verification (if required by host)**: Some hosts will automatically check for the DNS records. Others might have a "Verify" button you need to click on their platform after you've set the records in Devinit.
+6.  **Wait for DNS Propagation**: 
+    *   When you save DNS changes in Devinit, these are sent to our DNS provider (Dynadot).
+    *   Dynadot uses a **TTL (Time To Live) of 10 minutes** for these records. This means Dynadot instructs other DNS servers to cache your record information for 10 minutes before checking for an update from Dynadot.
+    *   Therefore, changes should start reflecting from Dynadot's side relatively quickly. You might see updates in some regions or when querying Dynadot's nameservers directly within 10-20 minutes.
+    *   However, **full global DNS propagation** (where all DNS servers and resolvers worldwide see the update) can still take longer. This is because various DNS servers and ISP resolvers across the internet cache records for different durations (sometimes ignoring or modifying the set TTL). Global propagation can range from a few minutes to, in some cases, up to 48 hours, though typically it's much faster (often within an hour or two for most users).
+    *   **Be patient**: If your site isn't immediately live, wait for this propagation period. You can use online tools like [whatsmydns.net](https://whatsmydns.net/) to check how your record is propagating in different parts of the world.
+
+## Important Considerations
+
+*   **Consult Provider Documentation**: **Always refer to your specific hosting provider's official documentation.** Their instructions are the most accurate and up-to-date. Our guides here are general aids.
+*   **One Record Type for Traffic**: For a given subdomain (e.g., `www.mysubdomain.devinit.example.com`), you typically use EITHER an A record OR a CNAME record to direct its main web traffic, not both simultaneously for the same purpose.
+*   **Apex Domains (Root Domains)**: The guides here focus on subdomains managed via Devinit (e.g., `sub.yourmain.com`). If you were dealing with an apex/root domain (e.g., `yourmain.com`) directly with a registrar, some providers have specific requirements (like ALIAS/ANAME records or requiring A records for apex domains if CNAMEs are not supported at the apex by the DNS provider). This is less of a concern for your Devinit-prefixed subdomains, which are inherently not apex domains.
+
+## Specific Provider Guides
+
+Please see the navigation menu for guides on specific hosting platforms. If your provider isn't listed, the general principles above and their own documentation should guide you. 

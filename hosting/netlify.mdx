@@ -1,0 +1,186 @@
+---
+title: Connecting to Netlify
+description: Point your Devinit subdomain to a Netlify site.
+---
+
+# Connecting Your Subdomain to Netlify
+
+Netlify is a popular platform for building, deploying, and managing modern web projects. Connecting your Devinit subdomain to a Netlify site is a common task.
+
+Always refer to the [official Netlify documentation on custom domains](https://docs.netlify.com/domains-https/custom-domains/) for the most current and comprehensive instructions.
+
+## Typical DNS Records Required by Netlify
+
+Netlify typically uses one of the following for custom subdomains:
+
+*   **For subdomains (like `mysubdomain.devinit.example.com`)**: Netlify often recommends using a **CNAME record** pointing to your Netlify site's default address (e.g., `your-netlify-site-name.netlify.app`).
+*   **For apex domains (not applicable here, but for context)**: Netlify provides specific IP addresses for A records if you were pointing an apex domain (e.g. `example.com`). For subdomains, CNAME is usually preferred.
+
+## General Steps
+
+1.  **Add Your Custom Subdomain in Netlify**:
+    *   Go to your Netlify site's dashboard.
+    *   Navigate to **Site settings > Domain management** (or a similar path).
+    *   Click on "Add custom domain" or "Add domain alias."
+    *   Enter your full Devinit subdomain (e.g., `mysubdomain.devinit.example.com`) and click "Verify" or "Add domain."
+    *   Netlify will check if the domain is already registered. Confirm that you own the domain and wish to use it.
+
+2.  **Identify Netlify's DNS Configuration**:
+    *   After adding the domain, Netlify will usually tell you what DNS record to create. For a subdomain, it will typically instruct you to create a **CNAME record**.
+    *   The **target value** for the CNAME record will be your Netlify site name (e.g., `your-awesome-site.netlify.app`).
+    *   It may also show a message like "Check DNS configuration" until the record is correctly set up and propagated.
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to Netlify.
+    *   Set **Record Type** to `CNAME`.
+    *   Set **Target Value** to your Netlify site's default hostname (e.g., `your-awesome-site.netlify.app`).
+    *   Click "Save Configuration".
+
+4.  **Verification in Netlify**:
+    *   Go back to your Netlify site's domain settings.
+    *   Netlify will periodically check the DNS records. Our DNS provider (Dynadot) uses a **10-minute TTL**, meaning updates from our side are quick. However, for Netlify to fully verify the record globally, it can take some time (from a few minutes to several hours, rarely up to 48 hours due to varying cache times across the internet). Please be patient.
+    *   Once Netlify verifies the CNAME record, it will provision an SSL certificate for your custom subdomain, and it will become active.
+
+## Troubleshooting
+
+*   **Netlify shows "Waiting for DNS" or similar error**:
+    *   Double-check that the CNAME record value in Devinit points exactly to your Netlify site name (e.g., `your-site.netlify.app`).
+    *   Ensure there are no other conflicting records (like an A record) for the same subdomain in your Devinit DNS settings that might interfere with the CNAME.
+    *   Allow sufficient time for DNS propagation (see point 4). Use a tool like [whatsmydns.net](https://whatsmydns.net/) to check the CNAME record for your subdomain.
+*   **SSL Certificate Issues**: Usually, Netlify handles SSL automatically once DNS is verified. If you have issues, ensure your DNS records are stable and correctly pointing to Netlify.
+
+**Always consult the [official Netlify documentation](https://docs.netlify.com/domains-https/custom-domains/) for the latest information and more detailed troubleshooting steps.**
+
+import { Steps } from 'mintlify/components';
+
+# Connecting to Netlify
+
+Netlify offers a straightforward way to deploy and host modern web projects. This guide will walk you through connecting your custom subdomain registered on our platform to your Netlify site.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A deployed site on Netlify.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Add Your Custom Domain in Netlify
+
+<Steps>
+
+### Navigate to Domain Settings
+   Log in to your Netlify account. Select the site you want to connect your subdomain to.
+   Go to **Site settings > Domain management** (or a similar path depending on the current Netlify UI).
+
+   *Placeholder for screenshot of Netlify site dashboard, highlighting "Domain management" or "Set up a custom domain".*
+   `![Netlify: Site Dashboard - Domain Management Link](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/netlify-site-ui.png "Netlify Site Dashboard - Domain Management or 'Set up a custom domain' button")`
+
+### Add Custom Domain
+   In the "Custom domains" panel, click on "Add custom domain" or "Add a domain alias."
+   Enter your full custom subdomain (e.g., `app.yourdomain.com` or `www.yourdomain.com`) and click "Verify" or "Add domain."
+
+   *Placeholder for screenshot of Netlify's "Add custom domain" input field.*
+   `![Netlify: Add Custom Domain Input](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/verify-domain.png "Netlify Add Custom Domain Input Field")`
+
+   Netlify will check if the domain is registered. If it is, it will ask you to confirm adding it to your site.
+
+   *Optional: Screenshot showing prompt to add domain after verification*
+   `![Netlify: Confirm Add Domain](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/add-domain.png "Netlify: Confirm Adding Domain to Site")`
+
+### Choose Setup Method
+   Netlify might ask if you want to use Netlify DNS or an external DNS. Since your domain is managed on our platform, you will typically choose the "external DNS" or "Add domain without Netlify DNS" option. If you're adding an apex domain (e.g., `yourdomain.com`), Netlify usually recommends using an A record. For subdomains (e.g., `www.yourdomain.com`, `app.yourdomain.com`), a CNAME record is standard.
+
+</Steps>
+
+## Step 2: Get DNS Records from Netlify
+
+After you add the domain, Netlify will provide you with the DNS records you need to configure on our platform.
+
+<Steps>
+
+### For Subdomains (e.g., `www.yourdomain.com`, `app.yourdomain.com`)
+   Netlify will typically provide a CNAME target. This will look something like `yoursite.netlify.app` or a similar Netlify-specific hostname.
+
+   *Placeholder for screenshot showing the CNAME record Netlify provides for a subdomain. Using registrar CNAME setup as fallback.*
+   `![Netlify: CNAME Record for Subdomain (Example from Registrar)](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/cname-record.png "Example of setting a CNAME record at a domain registrar for Netlify")`
+
+### For Apex/Root Domains (e.g., `yourdomain.com`)
+   Netlify will provide an IP address for an A record. It's usually `75.2.60.5` (Netlify's load balancer), but **always use the IP address shown in your Netlify dashboard as it may change.**
+
+   *Placeholder for screenshot showing the A record IP address Netlify provides for an apex domain. Using registrar A record setup as fallback.*
+   `![Netlify: A Record for Apex Domain (Example from Registrar)](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/a-record-dns.png "Example of setting an A record at a domain registrar for Netlify")`
+
+</Steps>
+
+## Step 3: Add DNS Records on Our Platform
+
+Now, log in to your account on our platform and navigate to the DNS management section for your domain.
+
+<Steps>
+
+### If Adding a Subdomain (CNAME Record)
+   *   **Type:** `CNAME`
+   *   **Name/Host:** Your subdomain (e.g., `www`, `app`).
+   *   **Value/Target:** The Netlify hostname provided in Step 2 (e.g., `yoursite.netlify.app`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### If Adding an Apex Domain (A Record)
+   *   **Type:** `A`
+   *   **Name/Host:** `@` (or leave blank, depending on our platform's UI for root domains).
+   *   **Value/Target:** The IP address provided by Netlify (e.g., `75.2.60.5`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### Save Changes
+   Confirm and save your DNS configurations on our platform.
+
+</Steps>
+
+## Step 4: Verify DNS Configuration in Netlify
+
+<Steps>
+
+### Wait for Propagation
+   DNS changes can take some time to propagate globally. Our platform uses a 10-minute TTL, but it can sometimes take up to an hour (or longer in rare cases) for Netlify to see the updated records.
+
+### Check Status in Netlify
+   Go back to the "Domain management" section in your Netlify site settings. Netlify usually automatically checks for the DNS records.
+   You should see a confirmation message or a status indicating it's waiting for DNS propagation or verifying. Once successful, it will often say "Netlify DNS" (if you were to use their DNS) or show that the domain is primary and has an SSL certificate.
+
+   *Placeholder for screenshot showing Netlify domain status as propagating or successfully configured.*
+   `![Netlify: Domain Propagation/Success Status](https://www.netlify.com/v3/img/blog/custom-domains-netlify-sites/subdomain-connected.png "Netlify Domain Status - Showing Connected Domains")`
+
+### SSL/TLS Certificate
+   Netlify automatically provisions a free SSL/TLS certificate (via Let's Encrypt) for your custom domain once the DNS records are correctly configured and propagated. This process usually starts automatically.
+
+</Steps>
+
+## Step 5: Test Your Subdomain
+
+Once Netlify shows that your custom domain is configured and the SSL certificate is active, try accessing `https://your.subdomain.com` (or `https://yourdomain.com` for apex) in your browser.
+
+## Troubleshooting
+
+<Steps>
+
+### Double-Check DNS Records
+   Ensure the CNAME target or A record IP address in our platform's DNS settings exactly matches what Netlify provided. Typos are common.
+
+### Propagation Time
+   Wait at least an hour. Use a DNS checker tool like `whatsmydns.net` to see if your CNAME or A record is visible globally.
+
+### Netlify DNS vs. External DNS
+   Ensure you followed the correct path in Netlify for using an external DNS provider (our platform). Using Netlify DNS involves changing your domain's nameservers, which is a different process.
+
+### Check Netlify Status Page
+   Visit [status.netlify.com](https://status.netlify.com/) to see if Netlify is experiencing any system-wide issues.
+
+### "Waiting for DNS" Message
+   If Netlify keeps showing "Waiting for DNS propagation," re-verify your DNS records on our platform. Sometimes deleting and re-adding the custom domain in Netlify can help after confirming DNS records are correct.
+
+</Steps>
+
+If you continue to experience issues, please consult the official Netlify documentation on custom domains or contact Netlify support. When contacting our support, please provide:
+*   Your domain name and the subdomain in question.
+*   The DNS records (CNAME or A) Netlify asked you to add.
+*   Screenshots of your DNS settings on our platform.
+*   Status messages from your Netlify domain management page. 

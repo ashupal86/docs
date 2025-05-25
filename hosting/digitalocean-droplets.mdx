@@ -1,0 +1,56 @@
+---
+title: Connecting to DigitalOcean Droplets
+description: Point your Devinit subdomain to a DigitalOcean Droplet.
+---
+
+# Connecting Your Subdomain to a DigitalOcean Droplet
+
+DigitalOcean Droplets are Linux-based virtual machines (VMs) that run on top of virtualized hardware. You can point your Devinit subdomain to a web server or application running on your Droplet.
+
+Always refer to the [official DigitalOcean DNS documentation](https://docs.digitalocean.com/products/networking/dns/) for the most comprehensive and up-to-date information.
+
+## Typical DNS Records Required for DigitalOcean Droplets
+
+To point your subdomain to a Droplet, you will almost always use an **A Record**.
+
+*   Each Droplet has a unique **static IP Address**. You will point your A record to this IP.
+
+## General Steps
+
+1.  **Find Your Droplet's IP Address**:
+    *   Log in to your DigitalOcean control panel.
+    *   Navigate to your list of Droplets.
+    *   Select the Droplet you want to point your subdomain to.
+    *   The Droplet's public IP address will be clearly displayed on its page (e.g., under "ipv4"). Copy this IP address.
+
+2.  **Ensure Your Web Server/Application is Configured on the Droplet**:
+    *   This is a crucial step that happens **on your Droplet itself**, not in Devinit or DigitalOcean's DNS settings (unless you are using DigitalOcean for DNS hosting, which is not the case here as Devinit handles DNS).
+    *   You need to have a web server (like Nginx or Apache) installed and configured on your Droplet.
+    *   This web server must be configured to listen for requests for your specific Devinit subdomain (e.g., `mysubdomain.devinit.example.com`) and serve the correct website content.
+    *   This often involves setting up a "virtual host" or "server block" in your web server's configuration that specifies your subdomain and the directory containing your site's files.
+    *   Ensure your Droplet's firewall (e.g., `ufw`) allows traffic on port 80 (HTTP) and port 443 (HTTPS).
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to your Droplet.
+    *   Set **Record Type** to `A`.
+    *   Set **Target Value** to the IP address of your DigitalOcean Droplet that you copied in Step 1.
+    *   Click "Save Configuration".
+
+4.  **Wait for DNS Propagation**:
+    *   DNS changes can take from a few minutes up to 48 hours to propagate globally, though it's usually much quicker. Our DNS provider (Dynadot) uses a **10-minute TTL**, meaning initial updates from Devinit are processed rapidly by Dynadot. However, for all internet resolvers to see the change and for your Droplet to be consistently accessible via the subdomain worldwide, some patience is needed for global cache updates.
+    *   Once propagated, requests to your Devinit subdomain should be routed to your Droplet's IP address.
+
+5.  **Set up SSL/TLS Certificate (on your Droplet)**:
+    *   After your subdomain is pointing to your Droplet, you should configure an SSL/TLS certificate (e.g., using Let's Encrypt with Certbot) on your Droplet to enable HTTPS for your subdomain. This is done on the server itself.
+
+## Troubleshooting
+
+*   **Subdomain Not Loading / Showing a Default Page / Error**: 
+    *   **DNS Propagation**: Allow sufficient time (see point 4 for details).
+    *   **Correct IP Address**: Verify the A record in Devinit points to the correct Droplet IP.
+    *   **Web Server Configuration**: This is the most common issue. Ensure your web server on the Droplet (Nginx, Apache, etc.) is correctly configured with a virtual host/server block for your specific subdomain and that the service is running.
+    *   **Firewall**: Check your Droplet's firewall to ensure it's not blocking HTTP/HTTPS traffic.
+    *   **Application Errors**: If DNS is resolving but you see application errors, check the logs for your application on the Droplet.
+
+**Consult the [DigitalOcean community tutorials](https://www.digitalocean.com/community/tutorials) and their [DNS documentation](https://docs.digitalocean.com/products/networking/dns/) for detailed guides on configuring web servers and troubleshooting.** 

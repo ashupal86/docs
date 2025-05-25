@@ -1,0 +1,120 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to AWS Amplify Hosting
+
+AWS Amplify Hosting provides a Git-based workflow for hosting full-stack serverless web apps with continuous deployment.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   An AWS account and an app deployed with AWS Amplify Hosting.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Add a Custom Domain in AWS Amplify
+
+<Steps>
+
+### Open AWS Amplify Console
+   Navigate to the AWS Amplify console and select your application.
+
+### Go to Domain Management
+   In the navigation pane, choose "Domain management."
+
+### Add Domain
+   Click "Add domain." Enter your root domain (e.g., `yourdomain.com`) and click "Configure domain."
+   Amplify typically manages domains by having you add the root domain, and then you can configure subdomains from there.
+
+### Configure Subdomains (and Root)
+   Amplify will guide you through setting up your domain. You usually have options to:
+   *   **Exclude the root domain** and only set up subdomains.
+   *   **Redirect the root domain** to a subdomain (e.g., `yourdomain.com` to `www.yourdomain.com`).
+   *   Configure specific subdomains (e.g., `www`, `app`).
+
+   For each subdomain (and the root, if you're using it directly), Amplify will provide DNS records that you need to add to your DNS provider. This is often a CNAME record pointing to an Amplify-specific hostname (like `xxxxxx.cloudfront.net`) or sometimes A/AAAA records if using Amplify's domain management features more deeply.
+
+   **Pay close attention to the CNAME Name and CNAME Value (or A/AAAA record details) provided by Amplify for each subdomain you configure.**
+
+### SSL/TLS Certificate
+   AWS Amplify automatically provisions an SSL/TLS certificate for your custom domain once it's successfully configured and DNS validation passes.
+
+</Steps>
+
+## Step 2: Add DNS Records on Our Platform
+
+Based on the information from AWS Amplify after adding your custom domain:
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard on our platform and go to the DNS management section for your domain.
+
+### Add CNAME Records (Most Common)
+   For each subdomain (e.g., `www`, `app`) you configured in Amplify:
+   *   **Type:** `CNAME`
+   *   **Name/Host:** The subdomain itself (e.g., `www`).
+   *   **Value/Target:** The CNAME target value provided by AWS Amplify (e.g., `d123abczyx.cloudfront.net`).
+   *   **TTL:** 600 seconds (10 minutes).
+
+### Add A/AAAA Records (Less Common, if specified by Amplify)
+   If Amplify provided A or AAAA records instead of a CNAME (this can happen in some configurations, especially if managing the domain more directly via Route 53 through Amplify):
+   *   **Type:** `A` or `AAAA`
+   *   **Name/Host:** Your subdomain.
+   *   **Value/Target:** The IP address(es) provided by Amplify.
+   *   **TTL:** 600 seconds (10 minutes).
+
+### Domain Verification Record (if required by Amplify)
+   Amplify might also require a TXT or CNAME record for domain verification, especially for the root domain or during initial setup. Add this record as specified by Amplify.
+    *   **Type:** `TXT` or `CNAME`
+    *   **Name/Host:** As specified by Amplify (e.g., `_amplify` or a specific string).
+    *   **Value/Target:** The verification value provided by Amplify.
+    *   **TTL:** 600 seconds (10 minutes).
+
+### Save Changes
+   Apply the new DNS record configurations.
+
+</Steps>
+
+## Step 3: Wait for DNS Propagation and SSL Activation
+
+<Steps>
+
+### DNS Propagation
+   Our platform uses a 10-minute (600 seconds) TTL. Allow 10-30 minutes for these changes to propagate globally. In some cases, it can take longer.
+
+### Amplify Verification
+   AWS Amplify will monitor the DNS changes. Once it verifies the records, it will proceed with SSL certificate provisioning and activating the domain.
+   You can monitor the status in the AWS Amplify console under "Domain management." It will show stages like "Pending verification," "Pending deployment," "Available."
+
+</Steps>
+
+## Step 4: Test Your Subdomain
+
+Once Amplify shows the domain as "Available," try accessing your subdomain (e.g., `https://www.yourdomain.com`) in a browser.
+
+## Troubleshooting
+
+<Steps>
+
+### Double-Check DNS Record Values
+   Ensure the CNAME (or A/AAAA) target values and names in our platform match *exactly* what AWS Amplify provided.
+
+### Amplify Console Status
+   The "Domain management" section in Amplify is your primary source of truth. It often provides error messages or status updates if something is wrong (e.g., "DNS records not found").
+
+### Propagation Delays
+   If it's been less than an hour, wait longer. Use a DNS propagation checker tool to see if your records are visible externally.
+
+### Root Domain vs. Subdomain Configuration
+   Amplify has specific ways of handling root domains (e.g., `yourdomain.com`) vs. subdomains (`www.yourdomain.com`). Ensure you followed Amplify's guidance for your desired setup.
+   Often, for root domains, an ALIAS record (if supported by your DNS provider) pointing to the CloudFront distribution is preferred, but Amplify typically guides you through a CNAME-based setup for subdomains.
+
+### Conflicting DNS Records
+   Ensure there are no other A, AAAA, or CNAME records for the exact same subdomain that could conflict with the Amplify ones.
+
+</Steps>
+
+If issues persist, consult the AWS Amplify Hosting documentation or AWS support. When contacting our support, please provide:
+*   Your domain name and the subdomain(s) in question.
+*   Screenshots of the DNS records provided by AWS Amplify.
+*   Screenshots of your DNS settings on our platform.
+*   The status messages from the AWS Amplify console. 

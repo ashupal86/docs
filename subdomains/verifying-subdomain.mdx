@@ -1,0 +1,68 @@
+---
+title: Configuring & Verifying Your Subdomain
+description: Set up DNS records for your subdomain to make it live.
+---
+
+# Configuring & Verifying Your Subdomain
+
+Once you have created/purchased a subdomain, the next vital step is to configure its DNS records. This tells the internet where to direct traffic for your subdomain (e.g., to a web server or another online service). On the Devinit platform, successfully saving this configuration also marks your domain as "verified."
+
+## Prerequisites
+
+*   You have successfully registered a subdomain, and it appears in the "Your Subdomains" list on your Profile Page.
+*   You know the **Record Type** (e.g., A, CNAME) and **Target Value** (e.g., IP address, another domain name) you need to point your subdomain to. This information is usually provided by your hosting service or the application you want to connect.
+
+## Understanding DNS Configuration Fields
+
+On your Profile Page, for each domain, you will find the following fields to configure:
+
+*   **Record Type**: The type of DNS record you want to create. Common types available on Devinit:
+    *   `A`: Points your subdomain to an IPv4 address (e.g., `192.0.2.123`). Used for pointing directly to a server.
+    *   `CNAME` (Canonical Name): Points your subdomain to another domain name (e.g., `my-service.example.com`). Used for aliasing or pointing to services that provide a hostname.
+    *   `TXT` (Text Record): Allows you to add arbitrary text. Often used for verification purposes by third-party services (like email providers, site verification tools).
+    *   `AAAA`: Points your subdomain to an IPv6 address. Similar to an A record but for newer IP addresses.
+*   **Target Value**: The destination for your subdomain based on the record type.
+    *   For `A` record: An IP address (e.g., `203.0.113.45`).
+    *   For `CNAME` record: Another domain name (e.g., `ghs.googlehosted.com` or `your-app.onrender.com`).
+    *   For `TXT` record: The text string required (e.g., `google-site-verification=xxxxxxxxxxxxxxxxx`).
+    *   For `AAAA` record: An IPv6 address.
+
+## Steps to Configure DNS
+
+1.  **Go to Your Profile Page**: Log in and navigate to your profile where your subdomains are listed.
+2.  **Locate Your Subdomain**: Find the subdomain you wish to configure in the list.
+3.  **Select Record Type**: From the dropdown menu (usually pre-filled with `A` or its current type), select the appropriate DNS record type (A, CNAME, TXT, or AAAA).
+4.  **Enter Target Value**: In the input field, carefully enter the target value provided by your hosting service or application.
+    *   **Important**: Double-check this value for typos. Incorrect values will prevent your subdomain from working correctly.
+5.  **Save Configuration**: Click the "Save Configuration" (or similar) button.
+
+## Expected Outcome
+
+*   **Success Message**: You should see a confirmation message like "Configuration saved successfully!"
+*   **Status Update**: The status of your domain on the Profile Page should update to "Active & Verified."
+*   **DNS Propagation**: The Devinit platform will now instruct our DNS provider (Dynadot) to update the DNS records for your subdomain. While this update is submitted quickly, global DNS propagation can sometimes take anywhere from a few minutes to 48 hours, though it's often much faster. During this time, your subdomain might not yet resolve correctly everywhere.
+
+## Troubleshooting Common Issues
+
+*   **"Target value and record type are required."**
+    *   Ensure you have selected a record type from the dropdown and entered a value in the target value field. Both are mandatory.
+
+*   **"Authentication error."**
+    *   Your session might have expired. Try logging out and logging back in. If the issue persists, please contact support.
+
+*   **"The target value '[value]' for record type '[type]' is already in use by another active subdomain ([otherdomain.name]). Please choose a different target."**
+    *   This is a crucial error to understand. To prevent conflicts and ensure services work correctly, the same target value cannot be used for the same record type on two different *active* subdomains you own on our platform.
+    *   **Solution**: You must choose a unique target value for this subdomain/record type combination, or if the other subdomain using it is no longer needed or can use a different target, reconfigure that one first.
+
+*   **"Failed to save domain configuration." (or similar errors indicating provider issues)**
+    *   This could indicate a temporary issue with our connection to the DNS provider. Please wait a few minutes and try saving again.
+    *   If the error message is specific (e.g., mentions Dynadot errors), please note it down.
+    *   If the problem continues, please contact [support](./../support/contact-us.mdx) with the error details.
+
+*   **Configuration saved, but subdomain isn't working externally.**
+    *   **Wait for DNS Propagation**: As mentioned, it can take time for DNS changes to be visible globally. Try clearing your browser cache or using a different network/device to check.
+    *   **Verify Target Value**: Double-check that the target value you entered is exactly what your service provider requires. A small typo can cause issues.
+    *   **Check with Service Provider**: Ensure the service you are pointing to is correctly configured to accept requests for your subdomain.
+    *   **Use DNS Checkers**: You can use online tools like `whatsmydns.net` to see how your DNS record is propagating across different regions.
+
+If you've waited a reasonable amount of time for propagation and have double-checked your settings, and your subdomain still isn't working, please gather all relevant details and contact [support](./../support/contact-us.mdx). 

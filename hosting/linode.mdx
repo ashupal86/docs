@@ -1,0 +1,56 @@
+---
+title: Connecting to Linode
+description: Point your Devinit subdomain to a Linode instance.
+---
+
+# Connecting Your Subdomain to a Linode
+
+Linode provides Linux virtual servers (Linodes) that you can use to host websites and applications. Pointing your Devinit subdomain to a Linode instance typically involves using an A record.
+
+Always consult the [official Linode DNS documentation](https://www.linode.com/docs/products/networking/dns-manager/) for the most comprehensive and current guidance, although in this case, you are managing DNS through Devinit, not Linode's DNS manager.
+
+## Typical DNS Records Required for Linodes
+
+To point your subdomain to a Linode, you will use an **A Record**.
+
+*   Each Linode instance has a unique **public IP Address**. You will configure an A record in your Devinit profile to point your subdomain to this IP.
+
+## General Steps
+
+1.  **Find Your Linode's IP Address**:
+    *   Log in to your Linode Cloud Manager.
+    *   Navigate to the "Linodes" section.
+    *   Select the Linode instance you want to use.
+    *   The Linode's public IP address (IPv4) will be displayed, usually in the "Networking" tab or summary section. Copy this IP address.
+
+2.  **Ensure Your Web Server/Application is Configured on the Linode**:
+    *   This is a critical configuration step performed **on your Linode instance itself**.
+    *   Install a web server (e.g., Nginx, Apache) on your Linode.
+    *   Configure the web server with a virtual host (or server block in Nginx) for your specific Devinit subdomain (e.g., `mysubdomain.devinit.example.com`). This tells the web server which site's files to serve when a request for your subdomain arrives.
+    *   Ensure your Linode's firewall (if configured, e.g., `ufw` or iptables) allows incoming traffic on port 80 (HTTP) and port 443 (HTTPS).
+
+3.  **Configure DNS Record in Devinit**:
+    *   Log in to your Devinit account and go to your Profile Page.
+    *   Find the subdomain you are connecting to your Linode.
+    *   Set **Record Type** to `A`.
+    *   Set **Target Value** to the public IP address of your Linode instance (copied in Step 1).
+    *   Click "Save Configuration".
+
+4.  **Wait for DNS Propagation**:
+    *   When you save changes in Devinit, they are sent to our DNS provider (Dynadot), which uses a **10-minute TTL**. This means the update from Dynadot's side is quick.
+    *   However, full **global DNS propagation** (all DNS servers worldwide seeing the update) can take longer, from a few minutes to 48 hours (though usually much faster). This is due to caching by various DNS resolvers across the internet.
+    *   Be patient. You can use online tools like [whatsmydns.net](https://whatsmydns.net/) to monitor propagation.
+
+5.  **Set up SSL/TLS Certificate (on your Linode)**:
+    *   Once DNS is resolving correctly, you should install an SSL/TLS certificate on your Linode (e.g., using Let's Encrypt with Certbot) to enable HTTPS for your subdomain. This is configured on your server.
+
+## Troubleshooting
+
+*   **Subdomain Not Loading / Showing Errors**: 
+    *   **DNS Propagation**: Allow adequate time as detailed in Step 4.
+    *   **Correct IP Address**: Ensure the A record in Devinit points to the exact public IP of your Linode.
+    *   **Web Server Configuration**: This is a common culprit. Double-check your Nginx/Apache virtual host/server block configuration for your subdomain. Ensure the web server service is running and there are no errors in its logs.
+    *   **Linode Firewall**: Verify your Linode's firewall isn't blocking web traffic.
+    *   **Application/Site Errors**: If DNS resolves but the site has errors, check your application or website logs on the Linode.
+
+**For detailed Linode-specific guides on setting up web servers or troubleshooting, refer to the extensive [Linode Documentation & Guides](https://www.linode.com/docs/).** 

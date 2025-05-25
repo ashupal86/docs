@@ -1,0 +1,125 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Microsoft Azure
+
+Connecting your custom subdomain to services on Microsoft Azure (e.g., App Service, Virtual Machines, Static Web Apps) requires updating your DNS records to point to your Azure resources.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   An active Azure account with a deployed application or resource.
+*   Access to your domain's DNS settings on our platform.
+
+## Step 1: Get Your Azure Resource's IP Address or Hostname
+
+This information depends on the Azure service you're using:
+
+<Steps>
+
+### For Azure App Service
+   You'll typically use a CNAME record pointing to the default hostname of your App Service (e.g., `yourapp.azurewebsites.net`). You will also need to add the custom domain in the App Service's "Custom domains" section and Azure might provide a TXT record for verification (`asuid.yoursubdomain`).
+
+### For Azure Virtual Machines
+   You will use the public IP address of your Azure VM. Ensure your VM has a static public IP address for reliability.
+
+### For Azure Static Web Apps
+   Azure provides a default hostname. You'll add your custom domain in the "Custom domains" section of your Static Web App, and Azure will guide you through validation, often providing a CNAME or TXT record to add to your DNS.
+
+### For Azure CDN
+    You will use a CNAME record pointing to the CDN endpoint hostname (e.g., `yourcdnendpoint.azureedge.net`).
+
+</Steps>
+
+Consult the specific Azure service documentation for the precise IP address or hostname.
+
+## Step 2: Add DNS Records on Our Platform
+
+<Steps>
+
+### Log in and Navigate to DNS
+   Access your dashboard and go to the DNS management section for your domain.
+
+### Add Necessary Records
+
+*   **For an IP Address (A Record - e.g., Azure VM):**
+    *   **Type:** `A`
+    *   **Name/Host:** Your subdomain (e.g., `app`, `blog`).
+    *   **Value/Target:** The public IP address of your Azure VM.
+    *   **TTL:** 600 seconds (10 minutes).
+
+*   **For a Hostname (CNAME Record - e.g., App Service, Static Web Apps, CDN):**
+    *   **Type:** `CNAME`
+    *   **Name/Host:** Your subdomain (e.g., `www`, `store`).
+    *   **Value/Target:** The Azure-provided hostname (e.g., `yourapp.azurewebsites.net`).
+    *   **TTL:** 600 seconds (10 minutes).
+
+*   **For Domain Verification (TXT Record - often required by Azure):**
+    *   Azure services like App Service or Static Web Apps might require a TXT record to verify domain ownership.
+    *   **Type:** `TXT`
+    *   **Name/Host:** Often `asuid.yoursubdomain` for App Service, or as specified by Azure for other services.
+    *   **Value/Target:** The verification string provided by Azure.
+    *   **TTL:** 600 seconds (10 minutes).
+
+### Save Your Changes
+   Apply the new DNS record configurations.
+
+</Steps>
+
+## Step 3: Configure Custom Domain in Azure Portal
+
+For most Azure services, you must add and validate your custom domain within the Azure portal:
+
+<Steps>
+
+### Navigate to Your Azure Resource
+   Go to your App Service, Static Web App, VM, etc., in the Azure portal.
+
+### Add Custom Domain
+   Look for a "Custom domains" or similar section.
+   *   Add your full custom domain (e.g., `app.yourdomain.com`).
+   *   Azure will perform a validation check. This is where the TXT or CNAME record (like `asuid`) you added previously comes into play.
+   *   Once validated, you can often set up a binding, which might include SSL certificate management.
+
+</Steps>
+
+## Step 4: Wait for DNS Propagation
+
+DNS changes rely on propagation. Our platform uses a 10-minute (600 seconds) TTL. This tells DNS servers globally to check for updates to your record every 10 minutes.
+
+*   **Typical Timing:** While the TTL is 10 minutes, allow 10-30 minutes for changes to be widely visible. In some cases, it can take a few hours for full global propagation.
+*   **Check Progress:** Use online DNS propagation checkers to see if your new records are resolving correctly from various locations.
+
+## Step 5: Configure SSL/TLS Certificates in Azure
+
+Secure your custom domain with SSL/TLS:
+
+*   **Azure Managed Certificates:** Services like App Service and Static Web Apps offer free managed SSL certificates for your custom domains, which are automatically renewed.
+*   **Bring Your Own Certificate:** You can also upload your own SSL certificates if you have specific requirements.
+
+Ensure an HTTPS binding is created for your custom domain in Azure.
+
+## Troubleshooting
+
+<Steps>
+
+### Verify DNS Record Values
+   Mistakes in IP addresses or hostnames are common. Double-check them against the information from Azure.
+
+### Check Azure Domain Validation
+   Ensure the domain validation steps in the Azure portal for your specific service were completed successfully. Check if Azure is still waiting for a verification record (TXT or CNAME).
+
+### Propagation Time
+   If you recently made changes, wait a bit longer. Use a DNS checker.
+
+### Azure Service Status
+   Check the Azure status page for any ongoing issues with the service you're using.
+
+### Firewall/Network Security Groups (NSGs)
+   If using an Azure VM, ensure your NSGs allow inbound traffic on ports 80 (HTTP) and 443 (HTTPS).
+
+### Browser Cache
+   Clear your browser cache or try an incognito window to rule out local caching issues.
+
+</Steps>
+
+If problems persist, gather details like your domain, subdomain, the Azure service used, screenshots of your DNS setup on our platform, and relevant Azure configurations before contacting support. 

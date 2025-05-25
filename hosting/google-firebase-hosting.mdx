@@ -1,0 +1,110 @@
+import { Steps } from 'mintlify/components';
+
+# Connecting to Google Firebase Hosting
+
+Firebase Hosting provides fast and secure hosting for your web apps, static and dynamic content, and microservices. Connecting a custom subdomain is straightforward.
+
+## Prerequisites
+
+*   A registered domain name managed through our platform.
+*   A Firebase project with Firebase Hosting set up and a site deployed.
+*   Access to your domain's DNS settings on our platform.
+*   Firebase CLI installed and configured (`firebase login`), or access to the Firebase Console.
+
+## Step 1: Add Custom Domain in Firebase Console
+
+<Steps>
+
+### Open Firebase Console
+   Navigate to the Firebase console, select your project, then go to the "Hosting" section.
+
+### Add Custom Domain
+   Click on "Add custom domain."
+   *   Enter the full subdomain you want to connect (e.g., `www.yourdomain.com` or `app.yourdomain.com`). Do **not** include `http://` or `https://`.
+   *   Firebase will then guide you through the process, which involves verification and then connecting the domain by providing DNS records.
+
+### Domain Verification (TXT Record)
+   Firebase will first require you to verify ownership of your domain (or subdomain).
+   *   It will provide a TXT record.
+   *   **Type:** `TXT`
+   *   **Host/Name:** Usually your subdomain itself (e.g., `app` if you are setting up `app.yourdomain.com`), or sometimes the root domain (`@` or `yourdomain.com`) or a specific verification hostname (e.g., `_firebase-verify.your.subdomain`). Firebase will specify this precisely.
+   *   **Value:** A unique verification string (e.g., `firebase=your-verification-string` or `google-site-verification=xxxxxxxx`).
+   You need to add this TXT record in your DNS settings on our platform. After adding, return to the Firebase console and click "Verify." This can take some time for DNS to propagate.
+
+### Get A Records for Hosting
+   Once your domain ownership is verified, Firebase will display the DNS records needed to point your subdomain to Firebase Hosting servers. These are typically two A records.
+   *   **Name/Host:** Your subdomain (e.g., `www`, `app`).
+   *   **Value/Target:** The IP addresses provided by Firebase.
+
+</Steps>
+
+## Step 2: Add DNS Records on Our Platform
+
+<Steps>
+
+### Log In and Navigate to DNS
+   Access your dashboard on our platform and go to the DNS management for your domain.
+
+### Add TXT Record for Verification (If not already done and verified)
+   *   **Type:** `TXT`
+   *   **Name/Host:** As specified by Firebase.
+   *   **Value/Target:** The verification string from Firebase.
+   *   **TTL:** 600 seconds (10 minutes), or 3600 (1 hour) if specified by Firebase.
+
+### Add A Records for Hosting Traffic
+   Once Firebase shows the A records (after verification during the "Connect Domain" step):
+   *   **For each A Record provided by Firebase (usually two):**
+        *   **Type:** `A`
+        *   **Name/Host:** Your subdomain (e.g., `www`, `app`).
+        *   **Value/Target:** The IP address given by Firebase.
+        *   **TTL:** 600 seconds (10 minutes), or 3600 seconds (1 hour) as Firebase often recommends.
+
+### Save Changes
+   Apply the DNS configurations on our platform.
+
+</Steps>
+
+## Step 3: Wait for DNS Propagation and SSL Provisioning
+
+<Steps>
+
+### DNS Propagation
+   TXT record propagation for verification can take from a few minutes up to several hours in rare cases. For the A records, while our platform sets a 10-minute TTL, Firebase's systems check according to the TTL they recommend (often 1 hour). Allow sufficient time.
+
+### Firebase Status Update & SSL
+   In the Firebase Hosting console, monitor the status of your custom domain. It will change from "Needs setup" or "Verifying" to "Pending" and finally to "Connected." Once DNS is propagated and Firebase confirms the A records are pointing correctly, it will automatically provision an SSL certificate. This usually takes a few minutes to an hour after DNS is confirmed.
+
+</Steps>
+
+## Step 4: Test Your Subdomain
+
+Once Firebase shows the status as "Connected" and the SSL certificate is active (you'll see a recent "Valid until" date), try accessing `https://your.subdomain.com`.
+
+## Troubleshooting
+
+<Steps>
+
+### Verify TXT Record
+   Ensure the TXT record for verification (Host and Value) is an exact match to what Firebase provided. Mistakes here are common.
+
+### Verify A Records
+   Double-check the IP addresses for the A records and ensure they are for the correct subdomain.
+
+### Firebase Console Status & Advanced Settings
+   The Firebase Hosting dashboard is key. If stuck on "Pending," click into the domain settings. Sometimes there's an "Advanced settings" or similar option that might show the expected DNS records again, or specific error messages.
+
+### Propagation Delays
+   Be patient. DNS changes are not instantaneous globally. Use online DNS checker tools to see what IP address your subdomain resolves to from different locations.
+
+### Conflicting DNS Records
+   Make sure no other A, AAAA, or CNAME records exist for the *exact* same subdomain. Firebase expects only the A records it provides for that specific subdomain to route traffic to its servers.
+
+### Firebase Site Deployment
+   Ensure you have successfully deployed a site to Firebase Hosting. A custom domain will result in an error if there's no content deployed to the default hosting site or the specific site target if using multiple sites.
+
+</Steps>
+
+If issues persist:
+*   Consult the official Firebase Hosting documentation on custom domains.
+*   Check the Firebase Status Dashboard for any outages.
+*   When contacting our support, provide your domain, subdomain, screenshots of DNS records required by Firebase (both TXT and A records, from the Firebase Console), and screenshots of your DNS setup on our platform, along with current status messages from the Firebase console. 

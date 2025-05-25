@@ -1,0 +1,75 @@
+{
+  "name": "Devinit Docs",
+  "theme": "mint",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#5AA9E6",
+    "dark": "#2563EB"
+  },
+  "topbarLinks": [
+    {
+      "name": "Get Support",
+      "url": "mailto:support@devinit.example.com"
+    }
+  ],
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "subdomains/creating-subdomain",
+          "subdomains/verifying-subdomain"
+        ]
+      },
+      {
+        "group": "Connecting to Hosting Providers",
+        "pages": [
+          "hosting/overview",
+          "hosting/vercel",
+          "hosting/netlify",
+          "hosting/render",
+          "hosting/github-pages",
+          "hosting/hostinger",
+          "hosting/digitalocean-droplets",
+          "hosting/linode",
+          "hosting/aws-ec2-lightsail",
+          "hosting/aws-s3-cloudfront",
+          "hosting/aws-amplify",
+          "hosting/google-cloud-run",
+          "hosting/google-firebase-hosting",
+          "hosting/azure-app-service",
+          "hosting/azure-static-web-apps",
+          "hosting/gcp",
+          "hosting/azure",
+          "hosting/fly-io",
+          "hosting/heroku"
+        ]
+      },
+      {
+        "group": "Help & Support",
+        "pages": [
+          "support/contact-us"
+        ]
+      },
+      {
+        "group": "Legal Information",
+        "icon": "shield-check",
+        "pages": [
+          "legal/terms-of-service",
+          "legal/privacy-policy",
+          "legal/acceptable-use-policy",
+          "legal/cookie-policy"
+        ]
+      }
+    ]
+  },
+  "footerSocials": {
+    "email": "mailto:support@devinit.example.com"
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  }
+} 
